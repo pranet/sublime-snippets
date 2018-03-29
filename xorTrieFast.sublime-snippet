@@ -1,0 +1,57 @@
+<snippet>
+	<content><![CDATA[
+/* 
+    1. Do not use on maxXor() on empty xorTrie.
+    2. cnt[0] is always 0 (to skip if checks in maxXor())
+*/
+template<class T>
+struct XorTrie {
+    int LIM, pool, *cnt, **to;
+    XorTrie(int n, int LIM) : LIM(LIM), pool(0) {
+        to = (int**)malloc(2 * sizeof(int*));
+        for (int i = 0; i < 2; ++i) {
+            to[i] = (int*)calloc(n * LIM, sizeof(int));
+        }
+        cnt = (int*)calloc(n * LIM, sizeof(int));
+    }
+    void insert(T x) {
+        int r = 0;
+        for (int i = LIM - 1; i >= 0; --i) {
+            bool c = x & (1LL << i);
+            if (!to[c][r]) {
+                to[c][r] = ++pool;
+            }
+            r = to[c][r];
+            ++cnt[r];
+        }
+    }
+    void erase(T x) {
+        int r = 0;
+        for(int i = LIM - 1; i >= 0; --i) {
+            bool c = x & (1LL << i);
+            r = to[c][r];
+            --cnt[r];
+        }
+    }
+    T maxXor(T x) {
+        int r = 0;
+        T ret = 0;
+        for(int i = LIM - 1; i >= 0; --i) {    
+            bool c = x & (1LL << i);
+            if (cnt[to[1 - c][r]]) {
+                ret += (1LL << i);
+                r = to[1 - c][r];
+            }
+            else {
+                r = to[c][r];
+            }
+        }
+        return ret;
+    }
+};
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>importXorTrieFast</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

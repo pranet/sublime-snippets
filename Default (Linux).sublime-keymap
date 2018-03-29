@@ -1,0 +1,11 @@
+[
+{ "keys": ["alt+shift+7"],
+    "caption": "2 cols (full - 3)",
+    "command": "set_layout",
+    "args":
+        { "cols": [0.0, 0.66, 1.0],
+          "rows": [0.0, 0.66, 1.0],
+          "cells": [ [0, 0, 1, 2], [1, 0, 2, 1], [1, 1, 2, 2] ]
+        }
+}
+]

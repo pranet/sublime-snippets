@@ -1,0 +1,55 @@
+<snippet>
+	<content><![CDATA[
+struct XorTrie
+{
+    int pool=0;
+    map<int,map<bool,int > > to;
+    map<int,int> cnt;
+    void insert(long long x)
+    {
+        int r=0;
+        for(int i=LIM-1;i>=0;--i)
+        {
+            bool c=x&(1LL<<i);
+            ++cnt[r];
+            if(to[r].find(c)==to[r].end())
+                to[r][c]=++pool;
+            r=to[r][c];
+        }
+        ++cnt[r];
+    }
+    void erase(int x)
+    {
+        int r=0;
+        for(int i=LIM-1;i>=0;--i)
+        {
+            bool c=x&(1LL<<i);
+            --cnt[r];
+            r=to[r][c];
+        }
+        --cnt[r];    
+    }
+    long long maxXor(long long x)
+    {
+        int r=0;
+        long long ret=0;
+        for(int i=LIM-1;i>=0;--i)
+        {    
+            bool c=x&(1LL<<i);
+            if(to[r].find(1-c)!=to[r].end() && cnt[to[r][1-c]])
+                ret+=(1LL<<i),
+                r=to[r][1-c];
+            else if(to[r].find(c)!=to[r].end() && cnt[to[r][c]])
+                r=to[r][c];
+            else
+                assert(false);
+        }
+        return ret;
+    }
+};
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>importXorTrie</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

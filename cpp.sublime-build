@@ -1,0 +1,26 @@
+{
+"cmd" : ["g++","-O2","-Wall","-Wno-unused-result","-Wno-sign-compare","-std=c++11", "$file_name", "-o", "${file_base_name}.exe"],
+"selector" : "source.c",
+"shell":false,
+"working_dir" : "$file_path",
+"variants": [
+
+        {  
+        	  	 
+            "cmd": ["./${file_base_name}.exe < input.txt"],
+            "shell": true,
+            "name": "Run",
+			"working_dir" : "$file_path"
+        },
+        {  
+        	  
+        	 
+            "cmd": ["pkill ${file_base_name}.exe"],
+            "shell": true,
+            "name": "pKill",
+			"working_dir" : "$file_path"
+        }
+    ]
+
+
+}

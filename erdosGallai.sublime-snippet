@@ -1,0 +1,44 @@
+<snippet>
+	<content><![CDATA[
+/* 
+https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93Gallai_theorem
+Complexity: O(n)
+Input: d(0-based, sorted in non-increasing order)
+*/
+bool erdosGallai(long long d[], int n)
+{
+	long long *ss = (long long *) malloc(sizeof(long long) * (n + 1));
+	ss[n] = 0;
+	for (int i = n - 1; i >= 0; --i)
+		ss[i] = ss[i + 1] + d[i];
+	int idx = n;
+	for (int k = 0; k < n; ++k)
+	{
+		if(idx < k + 1)
+			idx = k + 1;
+		while(idx - 1 > k && d[idx - 1] <= k)
+			--idx;
+		ss[k] = ss[idx] + (long long) (k + 1) * (idx - (k + 1));
+	}
+	long long s = 0;
+	bool flag = true;
+	for (int k = 0; k < n; ++k)
+	{
+		s += d[k];
+		if (s > (long long) k * (k + 1) + ss[k])
+		{
+			flag = false;
+			break;
+		}
+	}
+	if (s & 1)
+		flag = false;
+	free(ss);
+	return flag;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>importErdosGallai</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

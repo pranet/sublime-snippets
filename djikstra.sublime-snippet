@@ -1,0 +1,33 @@
+<snippet>
+	<content><![CDATA[
+vector<long long> djikstra(vector<vector<pair<int,int> > > g,int s)
+{
+    typedef pair<long long,int> Node; 
+    vector<long long> dist(g.size(),1e18);
+    priority_queue<Node,vector<Node>,greater<Node> > Q;
+    dist[s]=0;
+    Q.push({dist[s],s});
+    while(!Q.empty())
+    {
+        int u=Q.top().second;
+        long long d=Q.top().first;
+        Q.pop();
+        if(d>dist[u])
+            continue;
+        for(auto v:g[u])
+        {
+            if(dist[v.first]>dist[u]+v.second)
+            {
+                dist[v.first]=dist[u]+v.second;
+                Q.push({dist[v.first],v.first});
+            }
+        }
+    }
+    return dist;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>importDjikstra</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

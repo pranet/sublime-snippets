@@ -1,0 +1,20 @@
+<snippet>
+	<content><![CDATA[
+bool* isPrime;
+void generatePrimeSieve(const int lim)
+{
+  isPrime=(bool *)malloc(lim+1);
+  memset(isPrime,true,lim+1);
+  isPrime[0]=false;
+  isPrime[1]=false;
+  for(int i=2;i<=lim;++i)
+    if(isPrime[i])
+      for(int j=i+i;j<=lim;j+=i)
+        isPrime[j]=false;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>importPrimeSeive</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

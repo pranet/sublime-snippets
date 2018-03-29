@@ -1,0 +1,72 @@
+<snippet>
+	<content><![CDATA[
+struct HopcroftKarp
+{
+      int n,m,tim;
+      int *dist,*match,*used,*vis,*q;
+      vector<vector<int> > g;
+      HopcroftKarp(int n,int m):n(n),m(m),tim(42)
+      {
+            dist=(int*)malloc(sizeof(int)*(n+1));
+            q=(int*)malloc(sizeof(int)*(n+1));
+            used=(int*)calloc(n+1,sizeof(int));
+            match=(int*)calloc(m+1,sizeof(int));
+            vis=(int*)calloc(n+1,sizeof(int));
+            g.resize(n+1);
+      }
+      void add(int u,int v)
+      {
+            g[u].push_back(v);
+      }
+      void findPath()
+      {
+            memset(dist,63,sizeof(int)*(n+1));
+            int st=0,en=0;
+            for(int i=1;i<=n;++i)
+                  if(!used[i])
+                        q[en++]=i,dist[i]=0;
+            while(st<en)
+            {
+                  int u=q[st++];
+                  for(auto v:g[u])
+                        if(match[v] && dist[match[v]] > dist[u]+1)
+                              q[en++]=match[v],dist[match[v]]=dist[u]+1;
+            }
+      }
+      bool dfs(int u)
+      {
+            vis[u]=tim;
+            for(auto v:g[u])
+            {
+                  if( (!match[v]) || ( vis[match[v]]!=tim && dist[match[v]]==dist[u]+1 && dfs(match[v])))
+                  {
+                        match[v]=u;
+                        used[u]=true;
+                        return true;
+                  }
+            }
+            return false;
+      } 
+      int maxMatch()
+      {
+            int ret=0,f;
+            while(true)
+            {
+                  findPath();
+                  ++tim,f=0;
+                  for(int i=1;i<=n;++i)
+                        if(!used[i] && dfs(i))
+                              ++f;
+                  if(f==0)
+                        break;
+                  ret+=f;
+            }
+            return ret;
+      }
+};
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>importHopcroftKarp</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

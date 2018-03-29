@@ -1,0 +1,334 @@
+<snippet>
+	<content><![CDATA[
+
+/**
+ *   ///////////////////////
+ *   // Hash Library //
+ *   ///////////////////////
+ *
+ *   Pranet Verma
+ *
+ *   Disclaimer:Hashfunctionsaresubjecttocollisionrisk.Pleasethinktwicebeforehashing.
+
+ **/
+namespace hasher
+{
+long long MOD[]={999999937,999999929};
+long long X[]={31,37};
+
+struct Hash
+{
+  int first;
+  int second;
+  Hash(){}
+  Hash(int first,int second)
+  {
+    this->first=first;
+    this->second=second;
+  }
+  void display()
+  {
+    cout<<first<<" "<<second<<"\n";
+  }
+  bool operator < (const Hash &o) const
+  {
+    if(first==o.first)
+      return second<o.second;
+    return first<o.first;
+  }
+
+  Hash operator + (const Hash&o) const
+  {
+    Hash ret;
+    ret.first=(first+o.first)%MOD[0];
+    ret.second=(second+o.second)%MOD[1];
+    return ret;
+  }
+  Hash operator - (const Hash&o) const
+  {
+    Hash ret;
+    ret.first=(first-o.first+MOD[0])%MOD[0];
+    ret.second=(second-o.second+MOD[1])%MOD[1];
+    return ret;
+  }
+  Hash operator * (long long x) const
+  {
+    Hash ret;
+
+    ret.first=first*x;
+    ret.second=second*x;
+    ret.first%=MOD[0];
+    ret.second%=MOD[1];
+    if(ret.first<0)
+      ret.first+=MOD[0];
+    if(ret.second<0)
+      ret.second+=MOD[1];
+    return ret;
+
+  }
+};
+class Hasher
+{
+    private:
+    static vector<vector<int> > xpwr;
+    Hasher(){}
+    static vector<vector<int> > precomputePowers(int limit)
+    {
+        vector<vector<int> > xpwr;
+        xpwr.resize(1+max(X[0],X[1]));
+        xpwr[X[0]].resize(limit+1);
+        xpwr[X[1]].resize(limit+1);
+
+        xpwr[X[0]][0]=1;
+        xpwr[X[1]][0]=1;
+
+        for(int i=1;i<=limit;++i) 
+            xpwr[X[0]][i]=((long long)xpwr[X[0]][i-1]*X[0])%MOD[0],
+            xpwr[X[1]][i]=((long long)xpwr[X[1]][i-1]*X[1])%MOD[1];
+        
+        return xpwr;
+    }    
+    template<typename T>
+    static int hash(const T& s,long long X,long long MOD)
+    {
+      long long ans=0;
+      long long mul=1;
+      for(int i=0;i<s.size();++i)
+      {
+          mul*=X;
+          mul%=MOD;
+          ans+= s[i]*mul;
+          ans%=MOD;
+      }
+      if(ans<0)
+          ans+=MOD;
+      return (int)ans;
+    }
+    static int replaceOneChar(int oldHash,int index,int oldVal,int newVal,int X,int MOD)
+    {
+        long long mul=xpwr[X][index+1];
+        long long ans=oldHash + (newVal-oldVal)*mul;
+        if(ans>=MOD || ans<=-MOD)
+          ans%=MOD;
+        if(ans<0)
+            ans+=MOD;
+        return (int)ans;
+    }
+    static int pushBackCharacter(int oldHash,int index,int newVal,int X,int MOD)
+    {
+      long long mul=xpwr[X][index+1];
+      long long ans=oldHash + newVal*mul;
+      if(ans>=MOD || ans<=-MOD)
+        ans%=MOD;
+      if(ans<0)
+        ans+=MOD;
+      return (int)ans;
+    }
+    static int popBackCharacter(int oldHash,int index,int newVal,int X,int MOD)
+    {
+      long long mul=xpwr[X][index+1];
+      long long ans=oldHash - newVal*mul;
+      if(ans>=MOD || ans<=-MOD)
+        ans%=MOD;
+      if(ans<0)
+        ans+=MOD;
+      return (int)ans;
+    }
+    static int pushFrontCharacter(int oldHash,int newVal,int X,int MOD)
+    {
+      long long ans=((long long)oldHash+newVal)*X;
+      if(ans>=MOD || ans<=-MOD)
+        ans%=MOD;
+
+      if(ans<0)
+        ans+=MOD;
+      return (int)ans;
+    }
+    static int mergeHash(int pre,int post,int prelen,int X,int MOD)
+    {
+      long long mul=xpwr[X][prelen];
+      long long ans=pre+post*mul;
+      if(ans>=MOD || ans<=-MOD)
+        ans%=MOD;
+      if(ans<0)
+        ans+=MOD;
+      return ans;
+    }
+    static int increasePower(int pre,int increase,int X,int MOD)
+    {
+      long long mul=xpwr[X][increase];
+      return (pre*mul)%MOD;
+    }
+
+    public:
+    template<typename T>
+    static Hash hash(const T& s)
+    {
+      Hash  ans;
+      ans.first=hash(s,X[0],MOD[0]);
+      ans.second=hash(s,X[1],MOD[1]);
+      return ans;
+    }
+    static Hash replaceOneChar(const Hash& oldHash,int index,int oldVal,int newVal)
+    {
+        Hash ans;
+        ans.first=replaceOneChar(oldHash.first,index,oldVal,newVal,X[0],MOD[0]);
+        ans.second=replaceOneChar(oldHash.second,index,oldVal,newVal,X[1],MOD[1]);
+        return ans;
+    }   
+    static Hash pushBackCharacter(const Hash& oldHash,int index,int newVal)
+    {
+      Hash ans;
+      ans.first=pushBackCharacter(oldHash.first,index,newVal,X[0],MOD[0]);
+      ans.second=pushBackCharacter(oldHash.second,index,newVal,X[1],MOD[1]);
+      return ans;
+    }
+    static Hash popBackCharacter(const Hash& oldHash,int index,int newVal)
+    {
+      Hash ans;
+      ans.first=popBackCharacter(oldHash.first,index,newVal,X[0],MOD[0]);
+      ans.second=popBackCharacter(oldHash.second,index,newVal,X[1],MOD[1]);
+      return ans;
+    }
+    static Hash pushFrontCharacter(const Hash& oldHash,int newVal)
+    {
+      Hash ans;
+      ans.first=pushFrontCharacter(oldHash.first,newVal,X[0],MOD[0]);
+      ans.second=pushFrontCharacter(oldHash.second,newVal,X[1],MOD[1]);
+      return ans;
+    }
+    static Hash mergeHash(const Hash& pre,const Hash& post,int prelen)
+    {
+      Hash ans;
+      ans.first=mergeHash(pre.first,post.first,prelen,X[0],MOD[0]);
+      ans.second=mergeHash(pre.second,post.second,prelen,X[1],MOD[1]);
+      return ans;
+    }
+    static Hash increasePower(const Hash& pre,int increase)
+    {
+      Hash ans;
+      ans.first=increasePower(pre.first,increase,X[0],MOD[0]);
+      ans.second=increasePower(pre.second,increase,X[1],MOD[1]);
+      return ans;
+    }
+    template<typename T>
+    static vector<Hash > rollingHash(const T& s)
+    {
+      int n=s.size();
+      vector<Hash > ans(n);
+      Hash curr=hash(s);
+      for(int i=n-1;i>=0;--i)
+      {
+        curr=popBackCharacter(curr,n-1,s[i]);
+        curr=pushFrontCharacter(curr,s[i]);
+        ans[i]=curr;
+      }   
+      return ans;
+    }
+    template<typename T>
+    static vector<Hash > rollingHashOfReverse(const T& s)
+    {
+          string rb=s;
+          reverse(rb.begin(),rb.end());
+          vector<Hash> temp=rollingHash(rb);
+          temp.push_back(temp[0]);
+          reverse(temp.begin(),temp.end());
+          temp.pop_back(); 
+          return temp;
+    }
+
+    
+};
+vector<vector<int> > Hasher::xpwr=Hasher::precomputePowers(1000000);
+
+template <class T>
+class DynamicHash
+{
+    private:
+    set<pair<int,int> > table;
+    
+    public:
+    int size()
+    {
+      return table.size();
+    }
+    bool insert(const T &s)
+    {
+      return table.insert(this->hash(s)).second;
+    }
+    bool insert(const pair<int,int> &p)
+    {
+      return table.insert(p).second;
+    }
+    bool find(const pair<int,int>& p)
+    {
+      return table.find(p)!=table.end();
+    }
+    bool find(const T &s)
+    {
+      return find(this->hash(s));
+    }
+};
+template <class T>
+class StaticHash
+{
+    private:
+    vector<pair<int,int> > table;
+    bool isReady;
+
+    public:
+    StaticHash()
+    {
+      isReady=false;
+    }
+    int size()
+    {
+      return table.size();
+    }
+    void insert(const T& s)
+    {
+      if(isReady==true)
+      {
+        /* consider using a DynamicHash if you're going to be 
+        mixing operations very frequently */
+        assert(0);
+      }
+      table.push_back(this->hash(s));
+    }
+    void insert(const pair<int,int>& p)
+    {
+      if(isReady==true)
+      {
+        /* consider using a DynamicHash if you're going to be 
+        mixing operations very frequently */
+        assert(0);
+      }
+      table.push_back(p);
+    }
+
+    bool find(const pair<int,int>& p)
+    {
+      if(isReady==false)
+        {
+          sort(table.begin(),table.end());
+          table.erase(unique(table.begin(),table.end()),table.end());
+          isReady=true;
+        }
+      return binary_search(table.begin(),table.end(),p);
+    }
+    bool find(const T& s)
+    {
+      return find(this->hash(s));
+    }
+};
+
+}
+using namespace hasher;
+
+]]></content>
+
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>importHash</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

@@ -1,0 +1,56 @@
+<snippet>
+	<content><![CDATA[
+struct GridPatternMatch
+{
+    static unsigned long long a[1003][1003];
+    static bool find(vector<string> hay,vector<string> needle)
+    {
+        int n=hay.size(),m=hay[0].size();
+        int N=needle.size(),M=needle[0].size();
+        for(int i=0;i<n;++i)
+        {
+            unsigned long long h=0;
+            unsigned long long mul=1;
+            for(int j=0;j<M-1;++j)
+                h=h*173+hay[i][j],
+                mul*=173;
+            for(int j=M-1;j<m;++j)
+            {
+                h=h*173+hay[i][j];
+                a[i][j-M+1]=h;
+                h-=hay[i][j-M+1]*mul;
+            }            
+        }
+        unsigned long long b=0;
+        for(int i=0;i<N;++i)
+        {
+            unsigned long long h=0;
+            for(int j=0;j<M;++j)
+                h=h*173+needle[i][j];
+            b=b*173+h;
+        }
+        for(int j=0;j<m-M+1;++j)
+        {
+            unsigned long long h=0;
+            unsigned long long mul=1;
+            for(int i=0;i<N-1;++i)
+                h=h*173+a[i][j],
+                mul*=173;
+            for(int i=N-1;i<n;++i)
+            {
+                h=h*173+a[i][j];
+                if(b==h)
+                    return true;
+                h-=a[i-N+1][j]*mul;
+            }
+        }
+        return false;
+    }
+};
+unsigned long long GridPatternMatch::a[1003][1003];
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>importGridPatternMatch</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

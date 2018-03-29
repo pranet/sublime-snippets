@@ -1,0 +1,98 @@
+<snippet>
+	<content><![CDATA[
+struct MaxFlow
+{
+    typedef int Flow;
+    struct Edge
+    {
+        int u,v;
+        Flow f,c;
+        Edge(int u,int v,Flow f,Flow c):u(u),v(v),f(f),c(c){}
+    };
+    vector<vector<int> > g;
+    vector<Edge> e;
+    int *ptr,*dist,*q,n,source,sink;
+    MaxFlow(int n):n(n)
+    {
+        dist=(int*)malloc(sizeof(int)*n);
+        q=(int*)malloc(sizeof(int)*n);
+        ptr=(int*)malloc(sizeof(int)*n);
+        g.resize(n);
+    }
+    ~MaxFlow()
+    {
+        free(dist);
+        free(ptr);
+        free(q);
+        g.clear();
+        e.clear();
+    }   
+    void add(int u,int v,Flow c,Flow rc=0)
+    {
+        g[u].push_back(e.size());
+        e.push_back(Edge(u,v,0,c));
+        g[v].push_back(e.size());
+        e.push_back(Edge(v,u,0,rc));                
+    }
+    Flow flow(int source,int sink)
+    {
+        this->source=source;
+        this->sink=sink;
+        Flow res=0;
+        while(bfs())
+        {
+            memset(ptr,0,sizeof(int)*n);
+            while(Flow pushed=dfs(source,1e9))
+                res+=pushed;
+        }     
+        return res;
+    }
+    bool bfs()
+    {
+        memset(dist,63,sizeof(int)*n);
+        int st=0,en=0;
+        q[en++]=source;
+        dist[source]=0;
+        while(st<en)
+        {
+            int u=q[st++];
+            for(int i=0;i<(int)g[u].size();++i)
+            {
+                int id=g[u][i];
+                int v=e[id].v;
+                if(dist[v]>dist[u]+1 && e[id].f<e[id].c)
+                {
+                    dist[v]=dist[u]+1;
+                    q[en++]=v;
+                    if(v==sink)
+                        return 1;
+                }
+            }
+        }
+        return 0;
+    }
+    Flow dfs(int u,Flow flow)
+    {
+        if(u==sink || flow==0)
+            return flow;
+        for(int &i=ptr[u];i<(int)g[u].size();++i)
+        {
+            int id=g[u][i];
+            int v=e[id].v;
+            Flow pushed;
+            if(dist[v]==dist[u]+1 && (pushed=dfs(v,min(flow,e[id].c-e[id].f))) )
+            {
+                e[id].f+=pushed;
+                e[id^1].f-=pushed;
+                return pushed;
+            }
+        }
+        return 0;
+    }
+};   
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>importMaxFlow</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

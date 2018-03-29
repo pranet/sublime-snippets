@@ -1,0 +1,71 @@
+<snippet>
+	<content><![CDATA[
+typedef struct Node* pnode;
+struct Node
+{
+    long long val,lazy,tot;
+    int sz,prior;
+    pnode lt,rt;
+};
+pnode null=new Node{0,0,0,0,0,null,null};
+pnode init(int x)
+{
+    return new Node{x,0,x,1,rand(),null,null};
+}
+void update(pnode u)
+{
+    u->sz=1+u->lt->sz+u->rt->sz;
+    u->tot=u->lt->tot+u->rt->tot+u->val;
+}
+void lazy(pnode u)
+{
+    if(u->lazy)
+    {
+        u->lt->lazy+=u->lazy;
+        u->lt->tot+=u->lt->sz*u->lazy;
+        u->lt->val+=u->lazy;
+        u->rt->lazy+=u->lazy;
+        u->rt->tot+=u->rt->sz*u->lazy;
+        u->rt->val+=u->lazy;
+        u->lazy=0;
+    }    
+}
+void merge(pnode &u,pnode l,pnode r)
+{
+    if(l==null)
+        u=r;
+    else if(r==null)
+        u=l;
+    else
+    {
+        lazy(l);
+        lazy(r);
+        if(l->prior > r->prior)
+            merge(l->rt,l->rt,r),u=l;
+        else
+            merge(r->lt,l,r->lt),u=r;
+        update(u);
+    }
+
+}
+void split(pnode u,pnode &l,pnode &r,int key,int add)
+{   
+    if(u==null)
+        l=r=null;
+    else
+    {
+        lazy(u);
+        int rank=1+add+u->lt->sz;
+        if(rank<=key)
+            split(u->rt,u->rt,r,key,rank),l=u;
+        else
+            split(u->lt,l,u->lt,key,add),r=u;
+        update(u);
+    }
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>importTreap</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

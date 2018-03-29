@@ -1,0 +1,49 @@
+<snippet>
+	<content><![CDATA[
+struct Edge {
+	int u, v;
+	long long w;
+	bool operator < (const Edge &o) const {
+		return w < o.w;
+	}
+};
+struct DisjointSetUnion {	
+	int n, *par, *sz;
+	DisjointSetUnion(int n) : n(n) {
+		par = (int *) malloc(sizeof(int) * n);
+		sz = (int *) malloc(sizeof(int) * n);
+		reset();
+	}
+	void reset() {
+		iota(par, par + n, 0);
+		fill(sz, sz + n, 1);
+	}
+	int findSet(int u) {
+		return par[u] = par[u] == u ? u : findSet(par[u]);
+	}
+	bool mergeSet(int u, int v) {
+		if (findSet(u) != findSet(v)) {
+			sz[findSet(v)] += sz[findSet(u)];
+			par[findSet(u)] = findSet(v);
+			return true;
+		}
+		return false;			
+	}
+};
+long long MST(int n, vector<Edge> edges) {
+	long long cost = 0;
+	DisjointSetUnion dsu(n + 1);
+	sort(edges.begin(), edges.end());
+	for(auto e : edges) {
+		if (dsu.mergeSet(e.u, e.v)) {
+			cost += e.w;
+		}
+	}
+	return cost;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>importMinimumSpanningTree</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

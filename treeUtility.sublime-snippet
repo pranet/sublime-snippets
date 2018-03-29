@@ -1,0 +1,88 @@
+<snippet>
+	<content><![CDATA[
+struct TreeUtility {
+	vector<int> *g;
+	int n;
+	int LN;
+	int root;
+	int pool = 0;
+	int *st;
+	int *en;
+	int *dep;
+	int **pa;
+
+	TreeUtility(vector<int> g[], int n, int root = 1) : g(g), n(n), root(root) {
+		LN = ceil(log2(n + 1));
+		st = (int *)malloc(sizeof(int) * (n + 1));
+		en = (int *)malloc(sizeof(int) * (n + 1));
+		dep = (int *)malloc(sizeof(int) * (n + 1));
+		pa = (int **)malloc(sizeof(int *) * LN);
+		for (int i = 0; i < LN; ++i) {
+			pa[i] = (int *)malloc(sizeof(int) * (n + 1));
+		}
+		init();
+	}
+
+	void init() {
+		dfs(root, 0);
+		pa[0][0] = 0;
+		for (int j = 1; j < LN; ++j) {
+			for (int i = 0; i <= n; ++i) {
+				pa[j][i] = pa[j - 1][pa[j - 1][i]];
+			}
+		}
+	}
+	void dfs(int u, int p) {
+		st[u] = ++pool;
+		dep[u] = dep[p] + 1;
+		pa[0][u] = p;
+		for (auto v : g[u]) {
+			if (v != p) {
+				dfs(v, u);
+			}
+		}
+		en[u] = pool;
+	}
+
+	int lca(int u, int v) {
+		if (dep[u] < dep[v]) {
+			swap(u, v);
+		}
+		int d = dep[u] - dep[v];
+		for (int i = LN - 1; i >= 0; --i) {
+			if (d & (1 << i)) {
+				u = pa[i][u];
+			}
+		}
+		if (u == v) {
+			return u;
+		}
+		for (int i = LN - 1; i >= 0; --i) {
+			if (pa[i][u] != pa[i][v]) {
+				u = pa[i][u];
+				v = pa[i][v];
+			}
+		}
+		return pa[0][u];
+	}
+
+	int dist(int u, int v) {
+		return dep[u] + dep[v] - 2 * dep[lca(u, v)];
+	}
+
+	int kthAncestor(int u, int k) {
+		for (int i = LN - 1; i >= 0; --i) {
+			if (k & (1 << i)) {
+				u = pa[i][u];
+			}
+		}
+		return u;
+	}
+
+};
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>importTreeUtility</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

@@ -1,0 +1,142 @@
+<snippet>
+	<content><![CDATA[
+struct Point
+{ 
+  long long x,y;
+  Point()
+  {
+
+  }
+  Point(int x,int y)
+  {
+    this->x=x;
+    this->y=y;
+  }
+
+  void display()
+  {
+    cout<<x<<" "<<y<<endl;
+  }
+
+  bool operator < (const Point &other) const
+  {
+    if(y==other.y)
+      return x<other.x;
+    return y<other.y;
+  }
+
+};
+
+
+
+
+
+Point initial;
+
+long long dist(Point p1, Point p2)
+{
+    return (p1.x - p2.x)*(p1.x - p2.x) + (p1.y - p2.y)*(p1.y - p2.y);
+}
+
+int orientation(Point p, Point q, Point r)
+{
+    int val = (q.x - p.x) * (r.y - p.y)-(q.y - p.y) * (r.x - p.x);
+ 
+    if (val == 0) return 0;  // colinear
+    return (val > 0)? 1: -1; // clock or counterclock wise
+}
+
+bool compare1(const Point &p,const Point &q)
+{
+  if(p.y==q.y)
+    return p.x<q.x;
+
+  return p.y<q.y;
+}
+bool compare2(const Point &p,const Point &q)
+{
+  int o=orientation(initial,p,q);
+  if(o==0)
+    return dist(initial,p)<dist(initial,q)?true:false;
+
+  return o==1?true:false;
+}
+Point nextToTop(stack<Point> &S)
+{
+    Point p = S.top();
+    S.pop();
+    Point res = S.top();
+    S.push(p);
+    return res;
+}
+
+
+stack<Point> convexHull(Point p[],int n)
+{
+  
+  sort(p,p+n,compare1);
+  
+  initial=p[0];  
+  sort(p+1,p+n,compare2);
+  
+
+  stack<Point> S;
+
+  if(n==1)
+  {
+    S.push(p[0]);
+    return S;
+  }
+  if(n==2)
+  {
+    S.push(p[0]);
+    S.push(p[1]);
+    return S;
+  }
+  /*
+  if(n==3)
+  {
+    S.push(p[0]);
+    if(orientation(p[0],p[1],p[2]))
+      S.push(p[1]);
+    S.push(p[2]);  
+    return S;
+  }*/
+  S.push(p[0]);
+  S.push(p[1]);
+  //S.push(p[2]); //commented this out much later: might be wrong
+
+  for (int i = 2; i < n; ++i)
+  {
+    /* this while loop for allowing collinear points on the boundary : make it ==-1 to allow*/
+    while( S.size()>=2 && orientation(nextToTop(S),S.top(),p[i])!=1 )
+      S.pop();
+    S.push(p[i]);
+  }
+  return S;
+}
+
+
+double convexHullPerimeter(stack<Point> S)
+{
+  int n=S.size();
+  double ans=0;
+  Point initial=S.top();
+  Point latest=S.top();
+  S.pop();
+  while(!S.empty())
+  {
+    ans+=sqrtl(dist(latest,S.top()));
+    latest=S.top();
+    S.pop();
+  }
+  ans+=sqrt(dist(latest,initial));
+
+  return ans;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>importConvexHull</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

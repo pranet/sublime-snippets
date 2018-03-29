@@ -1,0 +1,122 @@
+<snippet>
+	<content><![CDATA[
+//Pranet Verma
+#include <bits/stdc++.h>
+using namespace std;
+
+typedef struct Node* pnode;
+pnode createNull();
+pnode null = createNull();
+struct Node {
+    
+    int id;
+    bool reverse;
+    int sz;
+    int priority;
+    pnode l, r;
+
+    Node(int id) : id(id), sz(1), priority(rand()), l(null), r(null) {
+
+    }
+
+    void update() {
+        sz = 1 + l->sz + r->sz;
+    }
+
+    void propagate() {
+        if (reverse) {
+            swap(l, r);
+            l->reverse ^= true;
+            r->reverse ^= true;
+            reverse = false;            
+        }
+    }
+
+    void display() {
+        if (this == null) {
+            return;
+        }
+        propagate();
+        l->display();
+        printf("%d ", id);
+        r->display();
+    }
+
+};
+
+void merge(pnode &u, pnode l, pnode r) {
+    if (l == null) {
+        u = r;
+    }
+    else if (r == null) {
+        u = l;
+    }
+    else {
+        l->propagate();
+        r->propagate();
+        if (l->priority > r->priority) {
+            merge(l->r, l->r, r);
+            u = l;
+        }
+        else {
+            merge(r->l, l, r->l);
+            u = r;
+        }
+        u->update();
+    }
+}
+
+void split(pnode u, pnode &l, pnode &r, int target, int offset) {
+    if (u == null) {
+        l = r = null;
+    }
+    else {
+        u->propagate();
+        int current = 1 + offset + u->l->sz;
+        if (current <= target) {
+            split(u->r, u->r, r, target, current);
+            l = u;
+        } 
+        else {
+            split(u->l, l, u->l, target, offset);
+            r = u;
+        }
+        u->update();
+    }
+}
+
+pnode createNull() {
+    pnode null = new Node(0);
+    null->l = null->r = null;
+    null->sz = 0;
+    null->reverse = false;
+    return null;
+}
+
+int main() {
+    int n, m;
+    scanf("%d %d", &n, &m);
+    pnode root = null; 
+    for (int i = 1; i <= n; ++i) {
+        merge(root, root, new Node(i));
+    }
+    for (int i = 0; i < m; ++i) {
+        int a, b, c;
+        scanf("%d %d %d", &a, &b, &c);
+        pnode A, B, C, afterStep[6];
+        split(root, A, afterStep[1], a, 0);
+        split(afterStep[1], B, afterStep[2], b, 0);
+        merge(afterStep[3], A, afterStep[2]);
+        split(afterStep[3], C, afterStep[4], c, 0);
+        B->reverse ^= true;
+        merge(afterStep[5], B, afterStep[4]);
+        merge(root, C, afterStep[5]);
+    }
+    root->display();
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>importTreapClean</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

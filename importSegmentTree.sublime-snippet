@@ -1,0 +1,115 @@
+<snippet>
+	<content><![CDATA[
+int n,N,base;
+struct Node
+{
+
+
+  void split(Node &l,Node &r)
+  {
+  /* add code here*/
+
+
+    /* ensure lazy propagation flag is reset */
+  }
+}identity;
+
+Node tree[1000000];
+Node merge(const Node &l,const Node &r)
+{
+    
+    Node n;
+
+    return n;  
+
+  /* add code here*/
+}
+
+void displayTree()
+{
+	for(int i=0;i<=N;++i)
+	{
+		for(int j=(1<<i)-1 ; j<(1<<(i+1))-1;++j)
+		{
+			/*add*/
+		}
+		cout<<endl;
+	}
+}
+void makeTree(int index,int l,int r)
+{
+  if(l==r)
+  {
+    /* add code here */
+    if(l<n)
+    {
+
+    }
+    else
+    {
+
+    }
+
+
+
+    return;
+  }
+  int mid=(l+r)/2;
+  makeTree(2*index+1,l,mid);
+  makeTree(2*index+2,mid+1,r);
+  tree[index]=merge(tree[2*index+1],tree[2*index+2]);
+}
+
+void mergeUp(int index)
+{
+  int parent;
+  while(index)
+  {
+    parent=(index-1)/2;
+    if(index%2==0)
+      tree[parent]=merge(tree[index-1],tree[index]);
+    else
+      tree[parent]=merge(tree[index],tree[index+1]);
+
+    index=parent;
+  }
+} 
+Node query(int index,int l,int r,int x,int y)
+{
+  if( y<l || x>r)
+    return identity;
+  if(x<=l && r<=y)
+    return tree[index];
+  
+  tree[index].split(tree[2*index+1],tree[2*index+2]);
+
+  int mid=(l+r)/2;
+  Node left=query(2*index+1,l,mid,x,y);
+  Node right=query(2*index+2,mid+1,r,x,y);
+  return merge(left,right);
+}
+
+void update(int index,int l,int r,int x,int y,/*add*/)
+{
+  if( y<l || x>r)
+    return ;
+  if(x<=l && r<=y)
+    {
+      /* add update code here */
+
+      mergeUp(index);
+      return ;
+    }
+  tree[index].split(tree[2*index+1],tree[2*index+2]);
+
+  int mid=(l+r)/2;
+  update(2*index+1,l,mid,x,y,/*add*/);
+  update(2*index+2,mid+1,r,x,y,/*add*/);
+
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>importSegmentTree</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

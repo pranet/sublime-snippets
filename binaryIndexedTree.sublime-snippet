@@ -1,0 +1,18 @@
+<snippet>
+	<content><![CDATA[
+template<class T> 
+struct BIT
+{
+    T *bit;int n;
+    BIT(int n):n(n){bit=(T*)calloc(n+1,sizeof(T));}
+    ~BIT(){free(bit);}
+    void reset(){memset(bit,0,sizeof(T)*(n+1));}
+    void update(int u,T v){while(u<=n)bit[u]+=v,u+=(u&-u);}
+    T read(int u){T ret=0;while(u)ret+=bit[u],u-=(u&-u);return ret;}    
+};
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>importBIT</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

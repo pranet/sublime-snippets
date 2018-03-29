@@ -1,0 +1,43 @@
+<snippet>
+	<content><![CDATA[
+#define matrix vector<vector<int> >
+matrix identityMatrix;
+matrix mul(const matrix &a,const matrix &b)
+{
+  int n=a.size();
+  matrix ans(n,vector<int> (n) );
+  for (int i = 0; i < n; ++i)
+  {
+    for (int j = 0; j < n; ++j)
+    {
+      for (int k = 0; k < n; ++k)
+      {
+        ans[i][j]+= ((long long)a[i][k]*b[k][j])%mod;
+        ans[i][j]%=mod;
+      }
+    }
+  }
+  return ans;
+} 
+matrix pwr(const matrix &a,long long n)
+{
+    if(n==0)
+    {
+      /*define identity */
+      assert(false);
+      return identityMatrix;
+    }
+    if(n==1)
+     return a;
+    matrix tmp=pwr(a,n/2);
+    tmp=mul(tmp,tmp);
+    if(n&1)
+      tmp=mul(a,tmp);
+    return tmp;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>importMatrixExponentiation</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

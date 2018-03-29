@@ -1,0 +1,32 @@
+<snippet>
+	<content><![CDATA[
+struct DisjointSetUnion {
+	
+	int n;
+	int *par, *sz;
+
+	DisjointSetUnion(int n) : n(n) {
+		par = (int *) malloc(sizeof(int) * n);
+		sz = (int *) malloc(sizeof(int) * n);
+		reset();
+	}
+		
+	void reset() {
+		iota(par, par + n, 0);
+		fill(sz, sz + n, 1);
+	}
+
+	int findSet(int u) {
+		return par[u] = par[u] == u ? u : findSet(par[u]);
+	}
+
+	void mergeSet(int u, int v) {
+		if (findSet(u) != findSet(v)) {
+			sz[findSet(v)] += sz[findSet(u)];
+			par[findSet(u)] = findSet(v);
+		}
+	}
+};
+]]></content>
+	<tabTrigger>importDSU</tabTrigger>
+</snippet>
