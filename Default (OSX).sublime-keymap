@@ -1,2 +1,14 @@
 [
+	{
+	"keys": ["super+shift+o"], "command": "insert_snippet", "args": {"name": "Packages/User/cppTemplate.sublime-snippet"}
+},
+	{
+	"keys": ["super+shift+c"], "command": "build", "args": {"variant": "pKill"}
+},
+{
+	"keys": ["super+b"], "command": "build", "args": {"variant": "Build"}
+},
+{
+	"keys": ["super+shift+b"], "command": "build", "args": {"variant": "Run"}
+}
 ]
