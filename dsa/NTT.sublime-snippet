@@ -73,13 +73,19 @@ struct PolynomialUtility {
     vector<int> multiply(const vector<int> &A, const vector<int> &B, int terms) {
         if (terms == -1) {
             terms = A.size() + B.size();   
+        } else {
+            terms =  terms * 2;// temp fix. Ask someone wtf is going on.
         }
         int n = 1 << (int)ceil(log2(terms));
         assert (n <= ntt->root_pw);
-        vector<int> FA(A.begin(), A.end());
-        vector<int> FB(B.begin(), B.end());
-        FA.resize(n);
-        FB.resize(n);
+        vector<int> FA(n);
+        vector<int> FB(n);
+        for (int i = 0; i < min(n / 2, (int)A.size()); ++i) {
+            FA[i] = A[i];
+        }
+        for (int i = 0; i < min(n / 2, (int)B.size()); ++i) {
+            FB[i] = B[i];
+        }
         ntt->transform(FA, false);
         ntt->transform(FB, false);
         for (int i = 0; i < FA.size(); ++i) {
@@ -123,6 +129,68 @@ struct PolynomialUtility {
         return FA;
     }
 
+    /**
+     * Let n be the smallest power of 2 which is greater than or equal to "terms".
+     * Returns the first n coefficients of x in 1 / A(x)
+     * 
+     * if terms == -1, it will assume the worst and make n as big as required.
+     *
+     * Rn(z) * F(z) = 1 mod z^n
+     *
+     * R2n(z) = 2 * Rn(Z) - Rn(Z)^2 * F(z) mod z^2n
+     */
+    vector<int> inverse(const vector<int> &F, int terms = -1) {
+        if (terms == -1) {
+            terms = F.size();
+        }
+        int n = 1 << (int)ceil(log2(terms));
+        vector<int> curr(1, ntt->pwr(F[0], ntt->mod - 2));
+        for (int m = 2; m <= n; m *= 2) {
+            vector<int> B = pwr(curr, 2, m); // prefer using pwr instead of multiply to reduce calls to fft()
+            B = multiply(B, F, m); // failing hard otherwise if i set size myself no clue why.
+            curr.resize(m);
+            for (int i = 0; i < m; ++i) {
+                curr[i] = curr[i] * 2 - B[i];
+                if (curr[i] < 0) {
+                    curr[i] += ntt->mod;
+                }
+            }       
+        }
+            
+        return curr;
+    }
+
+    /**
+     * Let n be the smallest power of 2 which is greater than or equal to "terms".
+     * Returns the first n coefficients of x in sqrt(A(x))
+     * 
+     * if terms == -1, it will assume the worst and make n as big as required.
+     *
+     * Rn(z) ^ 2   = F(z) mod z^n
+     *
+     * 2 * R2n(z) = Rn(Z) + F(z) / Rn(Z)  mod z^2n
+     *
+     * Pass a value "s" along with this function such that s^2 = F[0] % ntt->mod
+     */
+    vector<int> sqrt(const vector<int> &F, int s, int terms = -1) {
+        assert ((long long)s * s % ntt->mod == F[0]);
+        if (terms == -1) {
+            terms = F.size();
+        }
+        int n = 1 << (int)ceil(log2(terms));
+        vector<int> curr(1, s);
+        long long inverse_2 = ntt->pwr(2, ntt->mod - 2);
+        for (int m = 2; m <= n; m *= 2) {
+            vector<int> B = multiply(F, inverse(curr, m), m);
+            curr.resize(m);
+            for (int i = 0; i < m; ++i) {
+                curr[i] = (curr[i] + B[i]) * inverse_2 % ntt->mod;
+            }
+        }
+            
+        return curr;
+    }
+
     vector<int> getTransform(const vector<int> &A, bool invert) {
         int n = 1 << (int)ceil(log2(A.size()));
         vector<int> FA(A.begin(), A.end());
@@ -136,6 +204,7 @@ struct PolynomialUtility {
             A[i] = A[i] * 1ll * b % ntt->mod; 
         }
     }
+
 };
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
